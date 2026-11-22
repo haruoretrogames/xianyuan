@@ -51,6 +51,8 @@ const CARDS={
 };
 const PRESET_A=['xy','yr','le'], PRESET_B=['js','by','sz'];
 const SIDE=['我方','電腦'];
+// 紀錄中的陣營以 ⟦0⟧／⟦1⟧ 標記，由畫面依觀看者換成「我方／對手」
+const SN=s=>'⟦'+s+'⟧';
 let SIM=false, LOG=[], FXQ=[];
 function L(msg,cls){ if(!SIM) LOG.push({msg,cls:cls||'sys'}); }
 function FX(s,i,txt,kind){ if(!SIM) FXQ.push({s,i,txt,kind}); }
@@ -85,14 +87,14 @@ function damage(G,s,i,amt,pierce){
   }
   c.hp=Math.max(0,c.hp-d); FX(s,i,'-'+d,'dmg');
   L(`　${c.name} 受到 ${d} 點傷害（剩 ${c.hp}）`);
-  if(c.hp===0){ c.alive=false; L(`　★ ${SIDE[s]} ${c.name} 被擊倒！`,'sys'); }
+  if(c.hp===0){ c.alive=false; L(`　★ ${SN(s)} ${c.name} 被擊倒！`,'sys'); }
   return d;
 }
 function loseHp(G,s,i,amt,quiet){
   const c=G.players[s].chars[i]; if(!c.alive) return;
   c.hp=Math.max(0,c.hp-amt); FX(s,i,'-'+amt,'dmg');
   if(!quiet) L(`　${c.name} 失去 ${amt} 點 HP（剩 ${c.hp}）`);
-  if(c.hp===0){ c.alive=false; if(c.shield){c.shield=false;G.discard++;} L(`　★ ${SIDE[s]} ${c.name} 被擊倒！`,'sys'); }
+  if(c.hp===0){ c.alive=false; if(c.shield){c.shield=false;G.discard++;} L(`　★ ${SN(s)} ${c.name} 被擊倒！`,'sys'); }
 }
 function heal(G,s,i,amt){
   const c=G.players[s].chars[i]; if(!c.alive) return;
@@ -108,11 +110,11 @@ function targets(G,s,type){
 }
 function beginTurn(G){
   const p=G.players[G.cur]; G.cardUsed=false; G.turns++;
-  L(`第 ${G.round} 輪｜${SIDE[G.cur]}回合`,'r');
+  L(`第 ${G.round} 輪｜${SN(G.cur)}回合`,'r');
   if(R.firstSkipDraw && G.turns===1){ L(`先手第一回合不抽牌`,'p'+G.cur); }
   else if(G.deck.length){
     p.hand.push(G.deck.pop());
-    L(`${SIDE[G.cur]}抽 1 張牌（牌堆剩 ${G.deck.length}）`,'p'+G.cur);
+    L(`${SN(G.cur)}抽 1 張牌（牌堆剩 ${G.deck.length}）`,'p'+G.cur);
     if(G.deck.length===0 && G.finalRound===null){ G.finalRound=G.round; L(`抽走最後一張牌，放置決戰標記！本輪打完後，從下一輪起每輪結束雙方全體 -10 HP`,'sys'); }
   } else L(`牌堆已空，略過抽牌`,'p'+G.cur);
   p.spirit=Math.min(5,p.spirit+1);
@@ -122,7 +124,7 @@ function useCard(G,s,uid,ti){
   const card=p.hand.splice(k,1)[0], def=CARDS[card.key];
   G.cardUsed=true;
   const tgtName = (ti!=null && def.t!=='none') ? ' → '+(def.t==='enemy'?G.players[1-s]:p).chars[ti].name : '';
-  L(`${SIDE[s]}使用【${def.name}】${tgtName}`,'p'+s);
+  L(`${SN(s)}使用【${def.name}】${tgtName}`,'p'+s);
   const bonus=G.field==='xld'?10:0;
   switch(card.key){
     case 'jcy': heal(G,s,ti,30+bonus); break;
@@ -144,19 +146,19 @@ function doAction(G,s,act){
   const me=G.players[s], c=me.chars[act.ai];
   if(act.type==='atk'){
     const dmg=20+(G.field==='slp'?10:0);
-    L(`${SIDE[s]}${c.name} 普攻 → ${G.players[1-s].chars[act.ti].name}`,'p'+s);
+    L(`${SN(s)}${c.name} 普攻 → ${G.players[1-s].chars[act.ti].name}`,'p'+s);
     damage(G,1-s,act.ti,dmg);
   } else {
     me.spirit-=3; const d=CDEF[c.id]; const op=G.players[1-s];
     const sk=b=>b+(G.field==='syt'?10:0);
     const tn = d.t==='enemy'? ' → '+op.chars[act.ti].name : d.t==='ally'? ' → '+me.chars[act.ti].name : '';
-    L(`${SIDE[s]}${c.name} 施放【${d.skill}】${tn}（靈力 -3）`,'p'+s);
+    L(`${SN(s)}${c.name} 施放【${d.skill}】${tn}（靈力 -3）`,'p'+s);
     const r=R.c[c.id];
     switch(c.id){
       case 'xy': aliveIdx(G,1-s).forEach(i=>damage(G,1-s,i,sk(r.v))); break;
       case 'yr': damage(G,1-s,act.ti,sk(r.v)); break;
-      case 'le': aliveIdx(G,s).forEach(i=>heal(G,s,i,r.v)); if(r.x){ me.spirit=Math.min(5,me.spirit+r.x); L(`　${SIDE[s]}獲得 ${r.x} 點靈力（${me.spirit}）`);} break;
-      case 'an': { damage(G,1-s,act.ti,sk(r.v)); const l=Math.min(op.spirit,r.x); if(l>0){op.spirit-=l; FX(1-s,act.ti,'靈力-'+l,'sp'); L(`　${SIDE[1-s]}失去 ${l} 點靈力（剩 ${op.spirit}）`);} break; }
+      case 'le': aliveIdx(G,s).forEach(i=>heal(G,s,i,r.v)); if(r.x){ me.spirit=Math.min(5,me.spirit+r.x); L(`　${SN(s)}獲得 ${r.x} 點靈力（${me.spirit}）`);} break;
+      case 'an': { damage(G,1-s,act.ti,sk(r.v)); const l=Math.min(op.spirit,r.x); if(l>0){op.spirit-=l; FX(1-s,act.ti,'靈力-'+l,'sp'); L(`　${SN(1-s)}失去 ${l} 點靈力（剩 ${op.spirit}）`);} break; }
       case 'jj': damage(G,1-s,act.ti,sk(r.v)); loseHp(G,s,act.ai,r.x); break;
       case 'js': damage(G,1-s,act.ti,sk(r.v),true); break;
       case 'tn': damage(G,1-s,act.ti,sk(r.v)); heal(G,s,act.ai,r.x); break;
@@ -169,7 +171,7 @@ function doAction(G,s,act){
 }
 function discardCards(G,s,uids){
   const p=G.players[s];
-  uids.forEach(u=>{ const k=p.hand.findIndex(h=>h.uid===u); if(k>=0){ L(`${SIDE[s]}棄置【${CARDS[p.hand[k].key].name}】`,'p'+s); p.hand.splice(k,1); G.discard++; } });
+  uids.forEach(u=>{ const k=p.hand.findIndex(h=>h.uid===u); if(k>=0){ L(`${SN(s)}棄置【${CARDS[p.hand[k].key].name}】`,'p'+s); p.hand.splice(k,1); G.discard++; } });
 }
 function finishTurn(G){
   if(G.cur!==G.first){

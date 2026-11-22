@@ -28,7 +28,8 @@
         <button data-v="v04" class="on">V0.4</button><button data-v="v03">V0.3</button><button data-v="bal">平衡建議版</button>
       </div>
     </div>
-    <button class="btn primary" id="btnDraft">輪流選角開局</button>
+    <button class="btn primary" id="btnDraft">與電腦對戰</button>
+    <button class="btn primary jade" id="btnOnline">連線對戰（兩台裝置）</button>
     <button class="btn ghost" data-act="rules">規則速查</button>
   </div>
   <div class="foot">同人桌遊試玩設計，技能效果與數值為桌遊改編，非原作數據。</div>
@@ -39,8 +40,33 @@
   <div class="h2">選角</div>
   <p class="sub" id="draftInfo"></p>
   <div class="order" id="draftOrder"></div>
-  <div class="picks"><div><b>我方</b><span id="pkMe">—</span></div><div><b>電腦</b><span id="pkAi">—</span></div></div>
+  <div class="picks"><div><b>我方</b><span id="pkMe">—</span></div><div><b id="pkAiLbl">電腦</b><span id="pkAi">—</span></div></div>
   <div class="dgrid" id="draftGrid"></div>
+</section>
+
+<!-- ======== ONLINE LOBBY ======== -->
+<section id="scrOnline" class="screen" hidden>
+  <div class="h2">連線對戰</div>
+  <p class="sub">兩台裝置各自打開這個網站：一方建立房間，另一方輸入房間代碼加入。<br>規則版本：<b id="olRule">V0.4</b>（以房主的設定為準）</p>
+  <div class="menu ol">
+    <div class="olbox">
+      <div class="olt">我要開房</div>
+      <button class="btn primary" id="btnHost">建立房間</button>
+      <p class="olmsg" id="hostErr"></p>
+      <div id="hostInfo" hidden>
+        <div class="lbl">房間代碼</div>
+        <div class="code" id="roomCode">-----</div>
+        <div class="row2"><button class="btn" id="btnCopyCode">複製代碼</button><button class="btn" id="btnCopyLink">複製邀請連結</button></div>
+        <p class="olmsg" id="hostMsg"></p>
+      </div>
+    </div>
+    <div class="olbox">
+      <div class="olt">我要加入</div>
+      <div class="row2"><input id="joinCode" maxlength="5" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="輸入 5 碼代碼"><button class="btn primary" id="btnJoin">加入</button></div>
+      <p class="olmsg" id="joinMsg"></p>
+    </div>
+    <button class="btn ghost" id="btnOlBack">返回</button>
+  </div>
 </section>
 
 <!-- ======== GAME ======== -->
@@ -74,7 +100,9 @@
 <div id="modal"></div>
 <div id="cardpop"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.5/dist/peerjs.min.js"></script>
 <script src="js/engine.js"></script>
+<script src="js/net.js"></script>
 <script src="js/ui.js"></script>
 </body>
 </html>
