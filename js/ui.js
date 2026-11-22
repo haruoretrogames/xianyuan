@@ -17,8 +17,6 @@ document.querySelectorAll('#diffSeg button').forEach(b=>b.onclick=()=>{
 document.querySelectorAll('#verSeg button').forEach(b=>b.onclick=()=>{
   document.querySelectorAll('#verSeg button').forEach(x=>x.classList.toggle('on',x===b)); RULEKEY=b.dataset.v; applyRules(RULEKEY); });
 $('#btnDraft').onclick=startDraft;
-$('#btnPresetA').onclick=()=>startGame(PRESET_A,PRESET_B,Math.random()<.5?0:1);
-$('#btnPresetB').onclick=()=>startGame(PRESET_B,PRESET_A,Math.random()<.5?0:1);
 
 // ---------- draft ----------
 function startDraft(){

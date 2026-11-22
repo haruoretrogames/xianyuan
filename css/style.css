@@ -183,6 +183,8 @@ button{font:inherit;cursor:pointer}
 #cardpop span{display:block;text-align:center;margin-top:6px;color:var(--gold);font-family:var(--serif);font-size:15px;text-shadow:0 1px 3px #000}
 .mbtn.go{background:linear-gradient(#d8ab52,#a87b22);border-color:#a87b22;color:#1c140a;font-weight:700}
 
+.title h1.logo{margin:0 auto 6px;font-size:0;line-height:0;text-shadow:none}
+.logo-img{display:block;width:min(560px,92vw);aspect-ratio:900/356;margin:0 auto;background-size:contain;background-repeat:no-repeat;background-position:center;filter:drop-shadow(0 4px 18px rgba(0,0,0,.55))}
 /* ================= 響應式版面 ================= */
 /* 共用：戰場排列（手機與平板為單欄，依 order 排序） */
 .glay{display:flex;flex-direction:column}
@@ -264,7 +266,8 @@ button{font:inherit;cursor:pointer}
   .cbox .art{aspect-ratio:16/10}
 }
 
-/* 卡牌圖片 */
+/* LOGO 與卡牌圖片 */
+.ci-logo{background-image:url(../img/logo.webp)}
 .ci-txl{background-image:url(../cards/txl.webp)}
 .ci-yr{background-image:url(../cards/yr.webp)}
 .ci-le{background-image:url(../cards/le.webp)}
